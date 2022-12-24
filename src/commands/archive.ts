@@ -1,6 +1,6 @@
-import { Command, CommandRunner } from "nest-commander";
+import { SubCommand, CommandRunner } from "nest-commander";
 
-@Command({
+@SubCommand({
   name: "zippee",
   subCommands: [],
   description: "simple zip utility",

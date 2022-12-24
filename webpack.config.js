@@ -25,7 +25,8 @@ module.exports = {
     "@nestjs/common": "commonjs @nestjs/common",
   },
   output: {
-    filename: "index.js",
+    libraryTarget: 'commonjs2',
+    filename: 'index.js',
     path: path.resolve(__dirname, "dist"),
   },
 }
