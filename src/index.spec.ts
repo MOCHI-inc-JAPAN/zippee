@@ -28,50 +28,60 @@ const consoleLogMock = jest.spyOn(console, "log");
 const consoleWarnMock = jest.spyOn(console, "warn");
 const consoleErrorMock = jest.spyOn(console, "error");
 
-stdoutSpy.mockImplementation(() => {
-  return true;
-});
-stderrorSpy.mockImplementation(() => {
-  return true;
-});
-consoleLogMock.mockImplementation(() => {
-  return;
-});
-consoleWarnMock.mockImplementation(() => {
-  return;
-});
-consoleErrorMock.mockImplementation(() => {
-  return;
-});
-exitMock.mockImplementation((): never => {
-  return 0 as never;
-});
-
 describe("index", () => {
   let commandInstance!: TestingModule;
 
   beforeEach(async () => {
     stdoutSpy.mockReset();
     stderrorSpy.mockReset();
+    exitMock.mockReset()
+    consoleLogMock.mockReset()
+    consoleWarnMock.mockReset()
+    consoleErrorMock.mockReset()
+    stdoutSpy.mockImplementation(() => {
+      return true;
+    });
+    stderrorSpy.mockImplementation(() => {
+      return true;
+    });
+    consoleLogMock.mockImplementation(() => {
+      return;
+    });
+    consoleWarnMock.mockImplementation(() => {
+      return;
+    });
+    consoleErrorMock.mockImplementation(() => {
+      return;
+    });
+    exitMock.mockImplementation((): never => {
+      return 0 as never;
+    });
+
     commandInstance = await CommandTestFactory.createTestingCommand({
       imports: [ZippeeCommand],
     }).compile();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     stdoutSpy.mockRestore();
     stderrorSpy.mockRestore();
+    exitMock.mockRestore()
+    consoleLogMock.mockRestore()
+    consoleWarnMock.mockRestore()
+    consoleErrorMock.mockRestore()
   });
 
-  xit("show help with error", async () => {
+  it("show help with error", async () => {
     await CommandTestFactory.run(commandInstance);
     // expect(process.stdout.write).toBeCalled()
     expect(stderrorSpy.mock.calls[0][0]).toBe(outputHelp);
   });
 
-  xit("show help with stdout", async () => {
+  it("show help with stdout", async () => {
     await CommandTestFactory.run(commandInstance, ["zippee"]);
     // expect(process.stdout.write).toBeCalled()
-    expect(stdoutSpy.mock.calls[0][0]).toBe(outputHelp);
+    expect(
+      (stdoutSpy.mock.calls[0][0] as string).includes(`simple zip utility`)
+    ).toBeTruthy();
   });
 });

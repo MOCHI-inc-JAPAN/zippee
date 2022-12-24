@@ -12,34 +12,36 @@ Commands:
   help [command]  display help for command
 `;
 
-// https://github.com/facebook/jest/issues/9984
-jest.mock("child_process", () => {
-  return {
-    spawn() {
-      return;
-    },
-  };
-});
 
-const stdoutSpy = jest.spyOn(process.stdout, "write").mockImplementation(() => {
-  return true;
-});
-const stderrorSpy = jest
-  .spyOn(process.stderr, "write")
-  .mockImplementation(() => {
-    return true;
-  });
-jest.spyOn(process, "exit").mockImplementation(() => {
-  return 0 as never;
-});
+const stdoutSpy = jest.spyOn(process.stdout, "write")
+const stderrorSpy = jest.spyOn(process.stderr, "write")
+const exitMock = jest.spyOn(process, "exit")
 
 describe("ZippeeCommand", () => {
   let commandInstance!: TestingModule;
 
   beforeEach(async () => {
+    stdoutSpy.mockReset()
+    stderrorSpy.mockReset()
+    exitMock.mockReset()
+    stdoutSpy.mockImplementation(() => {
+      return true;
+    });
+    stderrorSpy.mockImplementation(() => {
+      return true;
+    });
+    exitMock.mockImplementation(() => {
+      return 0 as never;
+    });
     commandInstance = await CommandTestFactory.createTestingCommand({
       imports: [ZippeeCommand],
     }).compile();
+  });
+
+  afterAll(() => {
+    stdoutSpy.mockRestore();
+    stderrorSpy.mockRestore();
+    exitMock.mockRestore()
   });
 
   it("show help with error", async () => {
@@ -50,7 +52,7 @@ describe("ZippeeCommand", () => {
 
   it("show help with stdout", async () => {
     await CommandTestFactory.run(commandInstance, ["zippee"]);
-    expect(process.stderr.write).toBeCalled();
+    expect(process.stdout.write).toBeCalled();
     expect(
       (stdoutSpy.mock.calls[0][0] as string).includes(`simple zip utility`)
     ).toBeTruthy();
