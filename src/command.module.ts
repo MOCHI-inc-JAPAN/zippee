@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
-import { ZippeeCommand } from "./zippee.command";
+import { UnifyCommand } from "./commands/unify";
 
 @Module({
-  providers: [ZippeeCommand],
+  providers: [UnifyCommand],
 })
 export class CommandModule {}

@@ -1,5 +1,5 @@
 import { CommandTestFactory } from "nest-commander-testing";
-import { CommandModule, run } from "./index";
+import { UnifyCommand } from "./unify";
 import { TestingModule } from "@nestjs/testing";
 
 const outputHelp = `Usage: program [options] [command]
@@ -28,7 +28,7 @@ const consoleLogMock = jest.spyOn(console, "log");
 const consoleWarnMock = jest.spyOn(console, "warn");
 const consoleErrorMock = jest.spyOn(console, "error");
 
-describe("index", () => {
+describe("unify.ts", () => {
   let commandInstance!: TestingModule;
 
   beforeEach(async () => {
@@ -58,7 +58,7 @@ describe("index", () => {
     });
 
     commandInstance = await CommandTestFactory.createTestingCommand({
-      imports: [CommandModule],
+      imports: [UnifyCommand],
     }).compile();
   });
 
@@ -77,13 +77,17 @@ describe("index", () => {
     expect(stderrorSpy.mock.calls[0][0]).toBe(outputHelp);
   });
 
-  it("run main command listing all comands", async () => {
-    await run();
-    expect(process.stderr.write).toBeCalled();
-    expect(
-      (stderrorSpy.mock.calls[0][0] as string).includes(
-        "unify [options] <zipFiles...>  unify zip files into a directory with mapping"
-      )
-    ).toBeTruthy();
+  describe("run success", () => {
+    it("correct default values", async () =>{
+      const unifyCommandMock = jest.spyOn(UnifyCommand.prototype, 'run');
+      await CommandTestFactory.run(commandInstance, ['unify', '-o', 'dist', 'test.zip']);
+      expect(process.stdout.write).toBeCalled();
+      expect(
+        unifyCommandMock.mock.calls[0][0]
+      ).toEqual(['test.zip']);
+      expect(
+        unifyCommandMock.mock.calls[0][1]
+      ).toEqual({"archive": false, "force": false, "out": "dist"});
+    })
   });
 });
