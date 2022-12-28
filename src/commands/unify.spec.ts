@@ -12,15 +12,6 @@ Commands:
   help [command]                 display help for command
 `;
 
-// https://github.com/facebook/jest/issues/9984
-jest.mock("child_process", () => {
-  return {
-    spawn() {
-      return;
-    },
-  };
-});
-
 const stdoutSpy = jest.spyOn(process.stdout, "write");
 const stderrorSpy = jest.spyOn(process.stderr, "write");
 const exitMock = jest.spyOn(process, "exit");

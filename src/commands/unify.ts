@@ -1,7 +1,11 @@
 import {Command, CommandRunner, Option} from 'nest-commander'
 import path from 'path'
 
-type UnifyCommandOptions = {}
+type UnifyCommandOptions = {
+  out: string
+  archive: boolean
+  force: boolean
+}
 
 @Command({
   name: 'unify',
@@ -17,6 +21,7 @@ export class UnifyCommand extends CommandRunner {
   }
 
   async run (args: string[], options?:UnifyCommandOptions) {
+    const {archive, force, out} = options || {}
     process.stdout.write(JSON.stringify(options, null, 2))
     process.stdout.write(JSON.stringify(args, null, 2))
   }

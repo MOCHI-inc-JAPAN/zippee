@@ -20,9 +20,11 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   externals: {
-    "nest-commander": "commonjs nest-commander",
-    "@nestjs/core": "commonjs @nestjs/core",
-    "@nestjs/common": "commonjs @nestjs/common",
+    "nest-commander": "commonjs2 nest-commander",
+    "@nestjs/core": "commonjs2 @nestjs/core",
+    "@nestjs/common": "commonjs2 @nestjs/common",
+    "archiver": "commonjs2 archiver",
+    "fs": "commonjs2 fs",
   },
   output: {
     libraryTarget: 'commonjs2',
