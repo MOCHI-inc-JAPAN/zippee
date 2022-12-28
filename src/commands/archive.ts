@@ -1,7 +1,8 @@
 import { Command, CommandRunner, Option } from "nest-commander";
 import path from "path";
 import fs from "fs";
-import archiver from "archiver";
+import { ArchiveService } from "../services/archive.service";
+import { LogService } from "../services/log.service";
 
 type ArchiveCommandOptions = {
   out: string;
@@ -18,50 +19,30 @@ type ArchiveCommandOptions = {
   },
 })
 export class ArchiveCommand extends CommandRunner {
-  constructor() {
-    super();
-  }
-
-  private async load(
-    dirpath: string,
-    out: string,
-    {
-      level,
-    }: {
-      level: number;
-    }
+  constructor(
+    private readonly archiveService: ArchiveService,
   ) {
-    const output = fs.createWriteStream(out);
-    const archivePipe = archiver("zip", {
-      zlib: { level }, // Sets the compression level.
-    });
-    const outputStream = archivePipe.pipe(output);
-    const awaiter = new Promise((success, reject) => {
-      outputStream.on("finish", () => {
-        console.log('finish')
-        success('')
-      });
-      outputStream.on("error", (e) => {
-        reject(e)
-      });
-    })
-    await archivePipe.glob("**/*", { cwd: dirpath }).finalize();
-    await awaiter
+    super();
   }
 
   async run(args: string[], options?: ArchiveCommandOptions) {
     const [dir] = args;
-    const { force, level = 9, out = path.resolve(process.cwd(), `${args[0]}.zip`) } =
-      options || {};
+    const {
+      force,
+      level = 9,
+      out = path.resolve(process.cwd(), `${args[0]}.zip`),
+    } = options || {};
     const dirpath = dir.startsWith("/")
       ? dir
       : path.resolve(process.cwd(), dir);
     if (!fs.statSync(dirpath).isDirectory()) {
       throw new Error("Please specify a directory.");
     }
-    if(!force){
+    if (!force) {
       if (!(out.endsWith(".zip") || out.endsWith(".epub"))) {
-        throw new Error(`Please specify output file ends with ".zip" or ".epub". If you want to continue, run with -f or --force flag`);
+        throw new Error(
+          `Please specify output file ends with ".zip" or ".epub". If you want to continue, run with -f or --force flag`
+        );
       }
     }
     const outDir = path.dirname(out);
@@ -71,7 +52,7 @@ export class ArchiveCommand extends CommandRunner {
       });
     }
 
-    await this.load(dirpath, out, { level });
+    await this.archiveService.archive(dirpath, out, { level });
   }
 
   @Option({
@@ -94,12 +75,13 @@ export class ArchiveCommand extends CommandRunner {
   }
 
   @Option({
-    flags: '-f --force',
-    name: 'force',
-    description: 'force all zip files unified with overwriting duplicated files followed by one.',
+    flags: "-f --force",
+    name: "force",
+    description:
+      "force all zip files unified with overwriting duplicated files followed by one.",
     defaultValue: false,
   })
   forceFlag(): boolean {
-    return true
+    return true;
   }
 }

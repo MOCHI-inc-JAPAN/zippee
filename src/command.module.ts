@@ -1,9 +1,8 @@
 import { Module } from "@nestjs/common";
-import { UnifyCommand } from "./commands/unify";
-import { ArchiveCommand } from "./commands/archive";
-import { UnzipCommand } from "./commands/unzip";
+import { Services } from "./services";
+import { Commands } from "./commands";
 
 @Module({
-  providers: [UnifyCommand, ArchiveCommand, UnzipCommand],
+  providers: [...Services, ...Commands],
 })
 export class CommandModule {}
