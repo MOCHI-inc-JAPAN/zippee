@@ -9,6 +9,8 @@ Options:
 
 Commands:
   unify [options] <zipFiles...>  unify zip files into a directory with mapping
+  archive [options] <dir>        archive files into a zip
+  unzip [options] <dir>          unzip files and make them expanded to a zip
   help [command]                 display help for command
 `;
 

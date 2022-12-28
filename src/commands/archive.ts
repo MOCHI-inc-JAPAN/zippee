@@ -6,6 +6,7 @@ import archiver from "archiver";
 type ArchiveCommandOptions = {
   out: string;
   level: number;
+  force: boolean;
 };
 
 @Command({
@@ -50,7 +51,7 @@ export class ArchiveCommand extends CommandRunner {
 
   async run(args: string[], options?: ArchiveCommandOptions) {
     const [dir] = args;
-    const { level = 9, out = path.resolve(process.cwd(), `${args[0]}.zip`) } =
+    const { force, level = 9, out = path.resolve(process.cwd(), `${args[0]}.zip`) } =
       options || {};
     const dirpath = dir.startsWith("/")
       ? dir
@@ -58,8 +59,10 @@ export class ArchiveCommand extends CommandRunner {
     if (!fs.statSync(dirpath).isDirectory()) {
       throw new Error("Please specify a directory.");
     }
-    if (!out.endsWith(".zip")) {
-      throw new Error('Please specify output file ends with ".zip".');
+    if(!force){
+      if (!(out.endsWith(".zip") || out.endsWith(".epub"))) {
+        throw new Error(`Please specify output file ends with ".zip" or ".epub". If you want to continue, run with -f or --force flag`);
+      }
     }
     const outDir = path.dirname(out);
     if (!fs.existsSync(outDir)) {
@@ -88,5 +91,15 @@ export class ArchiveCommand extends CommandRunner {
   })
   parseLevel(arg: string): number {
     return parseInt(arg, 10);
+  }
+
+  @Option({
+    flags: '-f --force',
+    name: 'force',
+    description: 'force all zip files unified with overwriting duplicated files followed by one.',
+    defaultValue: false,
+  })
+  forceFlag(): boolean {
+    return true
   }
 }
