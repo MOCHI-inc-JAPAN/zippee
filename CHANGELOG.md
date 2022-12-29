@@ -1,5 +1,11 @@
 # zippee
 
+## 1.0.4
+
+### Patch Changes
+
+- 3744df9: fix: swc compiles decorator metadata can't be isolated on class
+
 ## 1.0.3
 
 ### Patch Changes
