@@ -1,5 +1,11 @@
 # zippee
 
+## 1.0.3
+
+### Patch Changes
+
+- 18c6549: chore: enable as commonjs module
+
 ## 1.0.2
 
 ### Patch Changes
