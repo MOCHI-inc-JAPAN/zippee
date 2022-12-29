@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "keywords": [
+    "zip",
+    "zippee",
+    "archive"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "cross-env NODE_ENV=\"production\" webpack",
@@ -31,6 +36,7 @@
     "@types/archiver": "^5.3.1",
     "@types/jest": "^29.2.4",
     "archiver": "^5.3.1",
+    "changeset": "^0.2.6",
     "cross-env": "^7.0.3",
     "husky": "^8.0.2",
     "jest": "^29.3.1",
