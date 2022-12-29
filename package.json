@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cross-env NODE_ENV=\"production\" webpack && tsc",
+    "build": "cross-env NODE_ENV=\"production\" tsc",
     "build:watch": "webpack --watch",
     "fmt": "prettier --write ./src/"
   },
