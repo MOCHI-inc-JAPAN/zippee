@@ -39,6 +39,11 @@ export class ArchiveCommand extends CommandRunner {
           `Please specify output file ends with ".zip" or ".epub". If you want to continue, run with -f or --force flag`
         );
       }
+      if (fs.existsSync(out)) {
+        throw new Error(
+          `A file exists at specified out's path. If you want to continue, run with -f or --force flag`
+        );
+      }
     }
     const outDir = path.dirname(out);
     if (!fs.existsSync(outDir)) {
