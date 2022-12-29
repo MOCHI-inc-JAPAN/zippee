@@ -1,5 +1,11 @@
 # zippee
 
+## 1.0.5
+
+### Patch Changes
+
+- 6558599: chore: use webpack when building
+
 ## 1.0.4
 
 ### Patch Changes
