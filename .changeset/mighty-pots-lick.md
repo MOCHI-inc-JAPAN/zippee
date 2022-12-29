@@ -1,5 +1,0 @@
----
-"zippee": major
----
-
-first release
