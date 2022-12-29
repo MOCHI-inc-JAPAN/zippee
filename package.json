@@ -2,7 +2,7 @@
   "name": "zippee",
   "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "keywords": [
     "zip",
     "zippee",
