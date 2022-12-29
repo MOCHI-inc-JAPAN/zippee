@@ -1,84 +1,92 @@
 import { CommandTestFactory } from "nest-commander-testing";
 import { UnifyCommand } from "./unify";
+import { ArchiveService } from "../services/archive.service";
 import { TestingModule } from "@nestjs/testing";
+import { Module } from "@nestjs/common";
+import fs from "fs";
 
-const outputHelp = `Usage: program [options] [command]
-
-Options:
-  -h, --help                     display help for command
-
-Commands:
-  unify [options] <zipFiles...>  unify zip files into a directory with mapping
-  help [command]                 display help for command
-`;
-
-const stdoutSpy = jest.spyOn(process.stdout, "write");
-const stderrorSpy = jest.spyOn(process.stderr, "write");
-const exitMock = jest.spyOn(process, "exit");
-const consoleLogMock = jest.spyOn(console, "log");
-const consoleWarnMock = jest.spyOn(console, "warn");
-const consoleErrorMock = jest.spyOn(console, "error");
+@Module({
+  providers: [UnifyCommand, ArchiveService],
+})
+class TestModule {}
 
 describe("unify.ts", () => {
   let commandInstance!: TestingModule;
 
   beforeEach(async () => {
-    stdoutSpy.mockReset();
-    stderrorSpy.mockReset();
-    exitMock.mockReset();
-    consoleLogMock.mockReset();
-    consoleWarnMock.mockReset();
-    consoleErrorMock.mockReset();
-    stdoutSpy.mockImplementation(() => {
-      return true;
-    });
-    stderrorSpy.mockImplementation(() => {
-      return true;
-    });
-    consoleLogMock.mockImplementation(() => {
-      return;
-    });
-    consoleWarnMock.mockImplementation(() => {
-      return;
-    });
-    consoleErrorMock.mockImplementation(() => {
-      return;
-    });
-    exitMock.mockImplementation((): never => {
-      return 0 as never;
-    });
-
     commandInstance = await CommandTestFactory.createTestingCommand({
-      imports: [UnifyCommand],
+      imports: [TestModule],
     }).compile();
   });
 
-  afterAll(async () => {
-    stdoutSpy.mockRestore();
-    stderrorSpy.mockRestore();
-    exitMock.mockRestore();
-    consoleLogMock.mockRestore();
-    consoleWarnMock.mockRestore();
-    consoleErrorMock.mockRestore();
-  });
-
-  it("show help with error", async () => {
-    await CommandTestFactory.run(commandInstance);
-    expect(process.stderr.write).toBeCalled();
-    expect(stderrorSpy.mock.calls[0][0]).toBe(outputHelp);
-  });
-
   describe("run success", () => {
-    it("correct default values", async () =>{
-      const unifyCommandMock = jest.spyOn(UnifyCommand.prototype, 'run');
-      await CommandTestFactory.run(commandInstance, ['unify', '-o', 'dist', 'test.zip']);
-      expect(process.stdout.write).toBeCalled();
-      expect(
-        unifyCommandMock.mock.calls[0][0]
-      ).toEqual(['test.zip']);
-      expect(
-        unifyCommandMock.mock.calls[0][1]
-      ).toEqual({"archive": false, "force": false, "out": "dist"});
-    })
+    it("success", async () => {
+      const outpath = "tmp/unified/normal";
+      await CommandTestFactory.run(commandInstance, [
+        "unify",
+        "-o",
+        outpath,
+        "fixtures/zip-a-content.zip",
+        "fixtures/zip-b-content.zip",
+      ]);
+      expect(fs.existsSync(outpath)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/a`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/a/1.txt`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/a/2.txt`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/b`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/b/1.txt`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/b/2.txt`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/c`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/c/dup.txt`)).toBeTruthy();
+      expect(fs.readFileSync(`${outpath}/c/dup.txt`).toString()).toEqual("a\n");
+    });
+    it("success force", async () => {
+      const outpath = "tmp/unified/force";
+      await CommandTestFactory.run(commandInstance, [
+        "unify",
+        "-f",
+        "-o",
+        outpath,
+        "fixtures/zip-a-content.zip",
+        "fixtures/zip-b-content.zip",
+      ]);
+      expect(fs.existsSync(outpath)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/a`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/a/1.txt`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/a/2.txt`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/b`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/b/1.txt`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/b/2.txt`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/c`)).toBeTruthy();
+      expect(fs.existsSync(`${outpath}/c/dup.txt`)).toBeTruthy();
+      expect(fs.readFileSync(`${outpath}/c/dup.txt`).toString()).toEqual("b\n");
+    });
+    it("archive normal", async () => {
+      const outpath = "tmp/unified/archive-f";
+      const runPromise = CommandTestFactory.run(commandInstance, [
+        "unify",
+        "-a",
+        "9",
+        "-o",
+        outpath,
+        "fixtures/zip-a-content.zip",
+        "fixtures/zip-b-content.zip",
+      ]);
+      expect(runPromise).rejects.toThrow();
+    });
+    it("archive force", async () => {
+      const outpath = "tmp/unified/archive-f";
+      await CommandTestFactory.run(commandInstance, [
+        "unify",
+        "-a",
+        "9",
+        "-f",
+        "-o",
+        outpath,
+        "fixtures/zip-a-content.zip",
+        "fixtures/zip-b-content.zip",
+      ]);
+      expect(fs.existsSync(`${outpath}.zip`)).toBeTruthy();
+    });
   });
 });

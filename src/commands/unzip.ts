@@ -1,7 +1,7 @@
 import { Command, CommandRunner, Option } from "nest-commander";
 import path from "path";
 import fs from "fs";
-import AdmZip from "adm-zip";
+import { ArchiveService } from "../services/archive.service";
 
 type UnzipCommandOptions = {
   out: string;
@@ -17,25 +17,16 @@ type UnzipCommandOptions = {
   },
 })
 export class UnzipCommand extends CommandRunner {
-  constructor() {
+  constructor(private readonly archiveService: ArchiveService) {
     super();
-  }
-
-  private async unzip(
-    zippath: string,
-    out: string,
-    { force }: { force: boolean }
-  ) {
-    const admZip = new AdmZip(zippath);
-    admZip.extractAllTo(out, force);
   }
 
   async run(args: string[], options?: UnzipCommandOptions) {
     const [dir] = args;
-    const {
-      force = false,
-      out = path.resolve(process.cwd(), args[0].replace(/\.(zip|epub)/, "")),
-    } = options || {};
+    const { force = false, out: _out } = options || {};
+    const out = _out
+      ? _out
+      : path.resolve(process.cwd(), args[0].replace(/\.(zip|epub)/, ""));
     const zippath = dir.startsWith("/")
       ? dir
       : path.resolve(process.cwd(), dir);
@@ -55,14 +46,14 @@ export class UnzipCommand extends CommandRunner {
         recursive: true,
       });
     }
-    await this.unzip(zippath, out, { force });
+    await this.archiveService.unzip(zippath, out, { force });
   }
 
   @Option({
     flags: "-o --out <out>",
     name: "out",
     description: "Output directory extartced to.",
-    defaultValue: undefined,
+    defaultValue: "",
   })
   parseOut(arg: string): string {
     return arg;

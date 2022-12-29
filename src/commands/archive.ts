@@ -2,7 +2,6 @@ import { Command, CommandRunner, Option } from "nest-commander";
 import path from "path";
 import fs from "fs";
 import { ArchiveService } from "../services/archive.service";
-import { LogService } from "../services/log.service";
 
 type ArchiveCommandOptions = {
   out: string;
@@ -19,19 +18,15 @@ type ArchiveCommandOptions = {
   },
 })
 export class ArchiveCommand extends CommandRunner {
-  constructor(
-    private readonly archiveService: ArchiveService,
-  ) {
+  constructor(private readonly archiveService: ArchiveService) {
     super();
   }
 
   async run(args: string[], options?: ArchiveCommandOptions) {
     const [dir] = args;
-    const {
-      force,
-      level = 9,
-      out = path.resolve(process.cwd(), `${args[0]}.zip`),
-    } = options || {};
+    const { force, level = 9, out: _out } = options || {};
+    const out = _out || path.resolve(process.cwd(), `${args[0]}.zip`);
+
     const dirpath = dir.startsWith("/")
       ? dir
       : path.resolve(process.cwd(), dir);
@@ -59,7 +54,7 @@ export class ArchiveCommand extends CommandRunner {
     flags: "-o --out <out>",
     name: "out",
     description: "Output directory extartced to.",
-    defaultValue: undefined,
+    defaultValue: "",
   })
   parseOut(arg: string): string {
     return arg;

@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 
 module.exports = {
   entry: "./src/index.ts",
@@ -24,11 +25,16 @@ module.exports = {
     "@nestjs/core": "commonjs2 @nestjs/core",
     "@nestjs/common": "commonjs2 @nestjs/common",
     "archiver": "commonjs2 archiver",
-    "fs": "commonjs2 fs",
   },
   output: {
     libraryTarget: 'commonjs2',
     filename: 'index.js',
     path: path.resolve(__dirname, "dist"),
   },
+  plugins: [
+    new webpack.IgnorePlugin({
+      resourceRegExp: /original-fs/,
+      contextRegExp: /adm-zip/
+    })
+  ]
 }

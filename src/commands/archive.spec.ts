@@ -6,10 +6,9 @@ import fs from "fs";
 import { Module } from "@nestjs/common";
 
 @Module({
-  providers: [ArchiveService, ArchiveCommand]
+  providers: [ArchiveService, ArchiveCommand],
 })
-class TestModule {
-}
+class TestModule {}
 
 describe("archive.ts", () => {
   let commandInstance!: TestingModule;
