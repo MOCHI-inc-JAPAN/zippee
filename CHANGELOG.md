@@ -1,5 +1,11 @@
 # zippee
 
+## 1.0.2
+
+### Patch Changes
+
+- 0c9901b: fix: move archiver to dependencies
+
 ## 1.0.1
 
 ### Patch Changes
