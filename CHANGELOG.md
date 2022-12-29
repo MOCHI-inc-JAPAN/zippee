@@ -1,5 +1,11 @@
 # zippee
 
+## 1.0.6
+
+### Patch Changes
+
+- 03fd8bf: fix: npm token reset
+
 ## 1.0.5
 
 ### Patch Changes
