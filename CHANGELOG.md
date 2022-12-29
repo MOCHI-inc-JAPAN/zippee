@@ -1,5 +1,11 @@
 # zippee
 
+## 1.0.7
+
+### Patch Changes
+
+- 18a7b5b: fix: publish way
+
 ## 1.0.6
 
 ### Patch Changes
